@@ -20,9 +20,29 @@ void solution(std::string file) {
 	}
 
 	// Part 1
-
-	std::cout << "Part 1: " <<  << "\n";
-	Utils::copy();
+	int safe = 0;
+	for (int i = 0; i < input.size(); i++) {
+		bool increasing = std::stoi(input[i][0]) - std::stoi(input[i][1]) < 0;
+		bool thisSafe = true;
+		for (int j = 1; j < input[i].size(); j++) {
+			int difference = 0;
+			if (increasing) {
+				difference = std::stoi(input[i][j]) - std::stoi(input[i][j - 1]);
+			}
+			else {
+				difference = std::stoi(input[i][j - 1]) - std::stoi(input[i][j]);
+			}
+			if (difference < 1 || difference > 3) {
+				thisSafe = false;
+				break;
+			}
+		}
+		if (thisSafe) {
+			safe++;
+		}
+	}
+	std::cout << "Part 1: " << safe << "\n";
+	Utils::copy(safe);
 
 	// Part 2
 
