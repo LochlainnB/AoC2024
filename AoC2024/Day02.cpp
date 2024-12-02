@@ -9,6 +9,36 @@
 #include <set>
 #include <queue>
 
+bool checkRecord(std::vector<std::string>& record, bool allowDampening) {
+	bool increasing = std::stoi(record[0]) - std::stoi(record[1]) < 0;
+	bool thisSafe = true;
+	for (int i = 1; i < record.size(); i++) {
+		int difference = 0;
+		if (increasing) {
+			difference = std::stoi(record[i]) - std::stoi(record[i - 1]);
+		}
+		else {
+			difference = std::stoi(record[i - 1]) - std::stoi(record[i]);
+		}
+		if (difference < 1 || difference > 3) {
+			if (allowDampening) {
+				std::vector<std::string> option1 = record;
+				option1.erase(option1.begin() + i - 1);
+				std::vector<std::string> option2 = record;
+				option2.erase(option2.begin() + i);
+				std::vector<std::string> option3 = record;
+				option3.erase(option3.begin());
+				thisSafe = checkRecord(option1, false) || checkRecord(option2, false) || checkRecord(option3, false);
+			}
+			else {
+				thisSafe = false;
+			}
+			break;
+		}
+	}
+	return thisSafe;
+}
+
 void solution(std::string file) {
 	std::string rawInput = Utils::loadFile(file);
 	// Use lines for 1D vector
@@ -22,22 +52,7 @@ void solution(std::string file) {
 	// Part 1
 	int safe = 0;
 	for (int i = 0; i < input.size(); i++) {
-		bool increasing = std::stoi(input[i][0]) - std::stoi(input[i][1]) < 0;
-		bool thisSafe = true;
-		for (int j = 1; j < input[i].size(); j++) {
-			int difference = 0;
-			if (increasing) {
-				difference = std::stoi(input[i][j]) - std::stoi(input[i][j - 1]);
-			}
-			else {
-				difference = std::stoi(input[i][j - 1]) - std::stoi(input[i][j]);
-			}
-			if (difference < 1 || difference > 3) {
-				thisSafe = false;
-				break;
-			}
-		}
-		if (thisSafe) {
+		if (checkRecord(input[i], false)) {
 			safe++;
 		}
 	}
@@ -45,9 +60,14 @@ void solution(std::string file) {
 	Utils::copy(safe);
 
 	// Part 2
-
-	//std::cout << "Part 2: " <<  << "\n";
-	//Utils::copy();
+	safe = 0;
+	for (int i = 0; i < input.size(); i++) {
+		if (checkRecord(input[i], true)) {
+			safe++;
+		}
+	}
+	std::cout << "Part 2: " << safe << "\n";
+	Utils::copy(safe);
 }
 
 int main() {
