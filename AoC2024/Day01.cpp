@@ -16,18 +16,33 @@ void solution(std::string file) {
 	// Use input for 2D vector
 	std::vector<std::vector<std::string>> input;
 	for (int i = 0; i < lines.size(); i++) {
-		input.push_back(Utils::split(lines[i], " "));
+		input.push_back(Utils::split(lines[i], "   "));
 	}
 
 	// Part 1
+	std::vector<int> first, second;
+	for (int i = 0; i < input.size(); i++) {
+		first.push_back(std::stoi(input[i][0]));
+		second.push_back(std::stoi(input[i][1]));
+	}
+	std::sort(first.begin(), first.end());
+	std::sort(second.begin(), second.end());
 
-	std::cout << "Part 1: " <<  << "\n";
-	Utils::copy();
+	int total = 0;
+	for (int i = 0; i < input.size(); i++) {
+		total += max(first[i], second[i]) - min(first[i], second[i]);
+	}
+
+	std::cout << "Part 1: " << total << "\n";
+	Utils::copy(total);
 
 	// Part 2
-
-	//std::cout << "Part 2: " <<  << "\n";
-	//Utils::copy();
+	total = 0;
+	for (int i = 0; i < input.size(); i++) {
+		total += first[i] * std::count(second.begin(), second.end(), first[i]);
+	}
+	std::cout << "Part 2: " << total << "\n";
+	Utils::copy(total);
 }
 
 int main() {
