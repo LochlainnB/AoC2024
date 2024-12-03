@@ -8,6 +8,7 @@
 #include <unordered_map>
 #include <set>
 #include <queue>
+#include <regex>
 
 void solution(std::string file) {
 	std::string rawInput = Utils::loadFile(file);
@@ -20,9 +21,23 @@ void solution(std::string file) {
 	}
 
 	// Part 1
+	std::regex expression("mul\\(\\d{1,3},\\d{1,3}\\)");
+	std::regex_token_iterator<std::string::iterator> it(rawInput.begin(), rawInput.end(), expression);
+	std::vector<std::string> matches;
+	while (it != std::regex_token_iterator<std::string::iterator>()) {
+		matches.push_back(*it);
+		it++;
+	}
 
-	std::cout << "Part 1: " <<  << "\n";
-	Utils::copy();
+	int total = 0;
+	for (int i = 0; i < matches.size(); i++) {
+		matches[i] = matches[i].substr(4, matches[i].size() - 5);
+		std::vector<std::string> numbers = Utils::split(matches[i], ",");
+		total += std::stoi(numbers[0]) * std::stoi(numbers[1]);
+	}
+
+	std::cout << "Part 1: " << total << "\n";
+	Utils::copy(total);
 
 	// Part 2
 
