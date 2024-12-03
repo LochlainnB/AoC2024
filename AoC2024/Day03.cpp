@@ -40,9 +40,32 @@ void solution(std::string file) {
 	Utils::copy(total);
 
 	// Part 2
+	expression = std::regex("(mul\\(\\d{1,3},\\d{1,3}\\))|(do\\(\\))|(don't\\(\\))");
+	it = std::regex_token_iterator<std::string::iterator>(rawInput.begin(), rawInput.end(), expression);
+	matches.clear();
+	while (it != std::regex_token_iterator<std::string::iterator>()) {
+		matches.push_back(*it);
+		it++;
+	}
 
-	//std::cout << "Part 2: " <<  << "\n";
-	//Utils::copy();
+	total = 0;
+	bool enabled = true;
+	for (int i = 0; i < matches.size(); i++) {
+		if (matches[i] == "do()") {
+			enabled = true;
+		}
+		else if (matches[i] == "don't()") {
+			enabled = false;
+		}
+		else if (enabled) {
+			matches[i] = matches[i].substr(4, matches[i].size() - 5);
+			std::vector<std::string> numbers = Utils::split(matches[i], ",");
+			total += std::stoi(numbers[0]) * std::stoi(numbers[1]);
+		}
+	}
+
+	std::cout << "Part 2: " << total << "\n";
+	Utils::copy(total);
 }
 
 int main() {
