@@ -22,7 +22,7 @@ void solution(std::string file) {
 	// Part 1
 	int total = 0;
 	for (int y = 0; y < lines.size(); y++) {
-		for (int x = 0; x < lines.size(); x++) {
+		for (int x = 0; x < lines[y].size(); x++) {
 			std::vector<std::string> words;
 
 			// Right
@@ -69,9 +69,20 @@ void solution(std::string file) {
 	Utils::copy(total);
 
 	// Part 2
+	total = 0;
+	for (int y = 1; y < lines.size() - 1; y++) {
+		for (int x = 1; x < lines[y].size() - 1; x++) {
+			if (lines[y][x] == 'A') {
+				if ((lines[y - 1][x - 1] == 'M' && lines[y + 1][x + 1] == 'S' || lines[y - 1][x - 1] == 'S' && lines[y + 1][x + 1] == 'M')
+					&& (lines[y - 1][x + 1] == 'M' && lines[y + 1][x - 1] == 'S' || lines[y - 1][x + 1] == 'S' && lines[y + 1][x - 1] == 'M')) {
+					total++;
+				}
+			}
+		}
+	}
 
-	//std::cout << "Part 2: " <<  << "\n";
-	//Utils::copy();
+	std::cout << "Part 2: " << total << "\n";
+	Utils::copy(total);
 }
 
 int main() {
