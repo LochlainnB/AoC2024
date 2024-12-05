@@ -20,9 +20,53 @@ void solution(std::string file) {
 	}
 
 	// Part 1
-	
-	std::cout << "Part 1: " <<  << "\n";
-	Utils::copy();
+	int total = 0;
+	for (int y = 0; y < lines.size(); y++) {
+		for (int x = 0; x < lines.size(); x++) {
+			std::vector<std::string> words;
+
+			// Right
+			if (x <= lines[y].size() - 4) {
+				words.push_back({ lines[y][x], lines[y][x + 1], lines[y][x + 2], lines[y][x + 3] });
+			}
+			// Left
+			if (x >= 3) {
+				words.push_back({ lines[y][x], lines[y][x - 1], lines[y][x - 2], lines[y][x - 3] });
+			}
+			// Down
+			if (y <= lines.size() - 4) {
+				words.push_back({ lines[y][x], lines[y + 1][x], lines[y + 2][x], lines[y + 3][x] });
+			}
+			// Up
+			if (y >= 3) {
+				words.push_back({ lines[y][x], lines[y - 1][x], lines[y - 2][x], lines[y - 3][x] });
+			}
+			// Up Right
+			if (x <= lines[y].size() - 4 && y >= 3) {
+				words.push_back({ lines[y][x], lines[y - 1][x + 1], lines[y - 2][x + 2], lines[y - 3][x + 3] });
+			}
+			// Down Right
+			if (x <= lines[y].size() - 4 && y <= lines.size() - 4) {
+				words.push_back({ lines[y][x], lines[y + 1][x + 1], lines[y + 2][x + 2], lines[y + 3][x + 3] });
+			}
+			// Down Left
+			if (x >= 3 && y <= lines.size() - 4) {
+				words.push_back({ lines[y][x], lines[y + 1][x - 1], lines[y + 2][x - 2], lines[y + 3][x - 3] });
+			}
+			// Up Left
+			if (x >= 3 && y >= 3) {
+				words.push_back({ lines[y][x], lines[y - 1][x - 1], lines[y - 2][x - 2], lines[y - 3][x - 3] });
+			}
+
+			for (std::string word : words) {
+				if (word == "XMAS") {
+					total++;
+				}
+			}
+		}
+	}
+	std::cout << "Part 1: " << total << "\n";
+	Utils::copy(total);
 
 	// Part 2
 
