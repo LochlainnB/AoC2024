@@ -9,6 +9,15 @@
 #include <set>
 #include <queue>
 
+std::unordered_map<std::string, std::set<std::string>> keyBeforeValue;
+std::unordered_map<std::string, std::set<std::string>> keyAfterValue;
+
+struct sortUpdate {
+	bool operator() (const std::string& lhs, const std::string& rhs) {
+		return keyBeforeValue[rhs].count(lhs) == 0 && keyAfterValue[lhs].count(rhs) == 0;
+	}
+};
+
 void solution(std::string file) {
 	std::string rawInput = Utils::loadFile(file);
 	// Split into the two input types
@@ -27,14 +36,13 @@ void solution(std::string file) {
 	}
 
 	// Part 1
-	std::unordered_map<std::string, std::set<std::string>> keyBeforeValue;
-	std::unordered_map<std::string, std::set<std::string>> keyAfterValue;
 	for (int i = 0; i < rules.size(); i++) {
 		keyBeforeValue[rules[i][0]].insert(rules[i][1]);
 		keyAfterValue[rules[i][1]].insert(rules[i][0]);
 	}
 
 	int total = 0;
+	std::vector<std::vector<std::string>> incorrectUpdates; // Part 2
 	for (int i = 0; i < updates.size(); i++) {
 		bool valid = true;
 		for (int j = 0; j < updates[i].size(); j++) {
@@ -56,15 +64,25 @@ void solution(std::string file) {
 		if (valid) {
 			total += std::stoi(updates[i][updates[i].size() / 2]);
 		}
+		else {
+			incorrectUpdates.push_back(updates[i]); // Part 2
+		}
 	}
 
 	std::cout << "Part 1: " << total << "\n";
 	Utils::copy(total);
 
 	// Part 2
+	total = 0;
+	for (int i = 0; i < incorrectUpdates.size(); i++) {
+		std::sort(incorrectUpdates[i].begin(), incorrectUpdates[i].end(), sortUpdate());
+		total += std::stoi(incorrectUpdates[i][incorrectUpdates[i].size() / 2]);
+	}
+	std::cout << "Part 2: " << total << "\n";
+	Utils::copy(total);
 
-	//std::cout << "Part 2: " <<  << "\n";
-	//Utils::copy();
+	keyBeforeValue.clear();
+	keyAfterValue.clear();
 }
 
 int main() {
