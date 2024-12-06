@@ -20,9 +20,51 @@ void solution(std::string file) {
 	}
 
 	// Part 1
+	std::set<std::pair<int, int>> visited;
+	std::pair<int, int> position;
+	for (int y = 0; y < lines.size(); y++) {
+		for (int x = 0; x < lines[y].size(); x++) {
+			if (lines[y][x] == '^') {
+				position = { x, y };
+				x = lines[y].size() - 1;
+				y = lines.size() - 1;
+			}
+		}
+	}
 
-	std::cout << "Part 1: " <<  << "\n";
-	Utils::copy();
+	int direction = 0;
+	while (position.first >= 0 && position.first < lines[0].size() && position.second >= 0 && position.second < lines.size()) {
+		visited.insert(position);
+		switch (direction) {
+		case 0:
+			if (position.second <= 0 || lines[position.second - 1][position.first] != '#') {
+				position.second--;
+			}
+			else direction = (direction + 1) % 4;
+			break;
+		case 1:
+			if (position.first >= lines[0].size() - 1 || lines[position.second][position.first + 1] != '#') {
+				position.first++;
+			}
+			else direction = (direction + 1) % 4;
+			break;
+		case 2:
+			if (position.second >= lines.size() - 1 || lines[position.second + 1][position.first] != '#') {
+				position.second++;
+			}
+			else direction = (direction + 1) % 4;
+			break;
+		case 3:
+			if (position.first <= 0 || lines[position.second][position.first - 1] != '#') {
+				position.first--;
+			}
+			else direction = (direction + 1) % 4;
+			break;
+		}
+	}
+
+	std::cout << "Part 1: " << visited.size() << "\n";
+	Utils::copy(visited.size());
 
 	// Part 2
 
