@@ -9,6 +9,59 @@
 #include <set>
 #include <queue>
 
+int getVisited(std::vector<std::string>& map) {
+	// Part 1
+	std::set<std::pair<int, int>> visited;
+	std::set<std::pair<std::pair<int, int>, int>> states;
+	std::pair<int, int> position;
+	for (int y = 0; y < map.size(); y++) {
+		for (int x = 0; x < map[y].size(); x++) {
+			if (map[y][x] == '^') {
+				position = { x, y };
+				x = map[y].size() - 1;
+				y = map.size() - 1;
+			}
+		}
+	}
+
+	int direction = 0;
+	while (position.first >= 0 && position.first < map[0].size() && position.second >= 0 && position.second < map.size()) {
+		visited.insert(position);
+		if (states.count({ position, direction })) {
+			return -1;
+		}
+		states.insert({ position, direction });
+		switch (direction) {
+		case 0:
+			if (position.second <= 0 || map[position.second - 1][position.first] != '#') {
+				position.second--;
+			}
+			else direction = (direction + 1) % 4;
+			break;
+		case 1:
+			if (position.first >= map[0].size() - 1 || map[position.second][position.first + 1] != '#') {
+				position.first++;
+			}
+			else direction = (direction + 1) % 4;
+			break;
+		case 2:
+			if (position.second >= map.size() - 1 || map[position.second + 1][position.first] != '#') {
+				position.second++;
+			}
+			else direction = (direction + 1) % 4;
+			break;
+		case 3:
+			if (position.first <= 0 || map[position.second][position.first - 1] != '#') {
+				position.first--;
+			}
+			else direction = (direction + 1) % 4;
+			break;
+		}
+	}
+
+	return visited.size();
+}
+
 void solution(std::string file) {
 	std::string rawInput = Utils::loadFile(file);
 	// Use lines for 1D vector
@@ -20,56 +73,26 @@ void solution(std::string file) {
 	}
 
 	// Part 1
-	std::set<std::pair<int, int>> visited;
-	std::pair<int, int> position;
-	for (int y = 0; y < lines.size(); y++) {
-		for (int x = 0; x < lines[y].size(); x++) {
-			if (lines[y][x] == '^') {
-				position = { x, y };
-				x = lines[y].size() - 1;
-				y = lines.size() - 1;
-			}
-		}
-	}
+	int visited = getVisited(lines);
 
-	int direction = 0;
-	while (position.first >= 0 && position.first < lines[0].size() && position.second >= 0 && position.second < lines.size()) {
-		visited.insert(position);
-		switch (direction) {
-		case 0:
-			if (position.second <= 0 || lines[position.second - 1][position.first] != '#') {
-				position.second--;
-			}
-			else direction = (direction + 1) % 4;
-			break;
-		case 1:
-			if (position.first >= lines[0].size() - 1 || lines[position.second][position.first + 1] != '#') {
-				position.first++;
-			}
-			else direction = (direction + 1) % 4;
-			break;
-		case 2:
-			if (position.second >= lines.size() - 1 || lines[position.second + 1][position.first] != '#') {
-				position.second++;
-			}
-			else direction = (direction + 1) % 4;
-			break;
-		case 3:
-			if (position.first <= 0 || lines[position.second][position.first - 1] != '#') {
-				position.first--;
-			}
-			else direction = (direction + 1) % 4;
-			break;
-		}
-	}
-
-	std::cout << "Part 1: " << visited.size() << "\n";
-	Utils::copy(visited.size());
+	std::cout << "Part 1: " << visited << "\n";
+	Utils::copy(visited);
 
 	// Part 2
-
-	//std::cout << "Part 2: " <<  << "\n";
-	//Utils::copy();
+	int obstructions = 0;
+	for (int y = 0; y < lines.size(); y++) {
+		for (int x = 0; x < lines[y].size(); x++) {
+			if (lines[y][x] == '.') {
+				std::vector<std::string> map(lines);
+				map[y][x] = '#';
+				if (getVisited(map) == -1) {
+					obstructions++;
+				}
+			}
+		}
+	}
+	std::cout << "Part 2: " << obstructions << "\n";
+	Utils::copy(obstructions);
 }
 
 int main() {
