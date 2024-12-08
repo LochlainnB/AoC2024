@@ -49,9 +49,32 @@ void solution(std::string file) {
 	Utils::copy(total);
 
 	// Part 2
+	total = 0;
+	for (int i = 0; i < input.size(); i++) {
+		int combinations = pow(3, numbers[i].size() - 1);
+		for (int combination = 0; combination < combinations; combination++) {
+			long long testValue = std::stoi(numbers[i][0]);
+			for (int j = 1; j < numbers[i].size(); j++) {
+				int oprator = combination / int(pow(3, j - 1)) % 3;
+				if (oprator == 0) {
+					testValue += std::stoi(numbers[i][j]);
+				}
+				else if (oprator == 1) {
+					testValue *= std::stoi(numbers[i][j]);
+				}
+				else {
+					testValue = std::stoll(std::to_string(testValue) + numbers[i][j]);
+				}
+			}
+			if (testValue == std::stoll(input[i][0])) {
+				total += testValue;
+				combination = combinations;
+			}
+		}
+	}
 
-	//std::cout << "Part 2: " <<  << "\n";
-	//Utils::copy();
+	std::cout << "Part 2: " << total << "\n";
+	Utils::copy(total);
 }
 
 int main() {
