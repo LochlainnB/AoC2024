@@ -9,6 +9,21 @@
 #include <set>
 #include <queue>
 
+struct File {
+	long long position;
+	long long length;
+	long long id;
+
+	long long checksum() {
+		return position * id * length + (static_cast<double>((length - 1) * (length - 1)) / 2 + static_cast<double>(length - 1) / 2) * id;
+	}
+};
+
+struct Space {
+	long long position;
+	long long length;
+};
+
 void solution(std::string file) {
 	std::string rawInput = Utils::loadFile(file);
 	// Use lines for 1D vector
@@ -20,9 +35,66 @@ void solution(std::string file) {
 	}
 
 	// Part 1
+	long long position = 0;
+	bool isFile = true;
+	std::vector<File> files;
+	std::vector<Space> spaces;
+	for (int i = 0; i < rawInput.size(); i++) {
+		long long length = std::stoi(std::string(1, rawInput[i]));
+		if (isFile) {
+			files.push_back({ position, length, static_cast<long long>(files.size()) });
+		}
+		else {
+			spaces.push_back({ position, length });
+		}
+		position += length;
+		isFile = !isFile;
+	}
 
-	std::cout << "Part 1: " <<  << "\n";
-	Utils::copy();
+	std::vector<File> newFiles;
+	isFile = true;
+	while (files.size() > 0) {
+		if (isFile) {
+			newFiles.push_back(files[0]);
+			files.erase(files.begin());
+			isFile = false;
+		}
+		else {
+			Space& space = spaces[0];
+			File& file = files[files.size() - 1];
+			if (space.length == file.length) {
+				file.position = space.position;
+				newFiles.push_back(file);
+				files.erase(files.begin() + files.size() - 1);
+				spaces.erase(spaces.begin());
+				isFile = true;
+			}
+			else if (space.length > file.length) {
+				file.position = space.position;
+				newFiles.push_back(file);
+				space.position += file.length;
+				space.length -= file.length;
+				files.erase(files.begin() + files.size() - 1);
+			}
+			else {
+				File splitFile = file;
+				splitFile.position = space.position;
+				splitFile.length = space.length;
+				newFiles.push_back(splitFile);
+				file.length -= space.length;
+				spaces.erase(spaces.begin());
+				isFile = true;
+			}
+		}
+	}
+
+	long long checksum = 0;
+	for (int i = 0; i < newFiles.size(); i++) {
+		checksum += newFiles[i].checksum();
+	}
+
+	std::cout << "Part 1: " << checksum << "\n";
+	Utils::copy(checksum);
 
 	// Part 2
 
