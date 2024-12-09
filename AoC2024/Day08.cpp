@@ -55,9 +55,27 @@ void solution(std::string file) {
 	Utils::copy(antinodes.size());
 
 	// Part 2
+	for (auto it = frequencies.begin(); it != frequencies.end(); it++) {
+		std::vector<std::pair<int, int>>& frequency = it->second;
+		for (int i = 0; i < frequency.size() - 1; i++) {
+			for (int j = i + 1; j < frequency.size(); j++) {
+				std::pair<int, int> iToJ = { frequency[j].first - frequency[i].first, frequency[j].second - frequency[i].second };
+				for (std::pair<int, int> position = frequency[j];
+				position.first >= 0 && position.first < lines[0].size() && position.second >= 0 && position.second < lines.size();
+				position = { position.first + iToJ.first, position.second + iToJ.second }) {
+					antinodes.insert(position);
+				}
+				for (std::pair<int, int> position = frequency[i];
+				position.first >= 0 && position.first < lines[0].size() && position.second >= 0 && position.second < lines.size();
+				position = { position.first - iToJ.first, position.second - iToJ.second }) {
+					antinodes.insert(position);
+				}
+			}
+		}
+	}
 
-	//std::cout << "Part 2: " <<  << "\n";
-	//Utils::copy();
+	std::cout << "Part 2: " << antinodes.size() << "\n";
+	Utils::copy(antinodes.size());
 }
 
 int main() {
