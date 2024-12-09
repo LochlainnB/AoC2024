@@ -20,9 +20,39 @@ void solution(std::string file) {
 	}
 
 	// Part 1
+	std::unordered_map<char, std::vector<std::pair<int, int>>> frequencies;
+	std::set<std::pair<int, int>> antinodes;
+	for (int y = 0; y < lines.size(); y++) {
+		for (int x = 0; x < lines[y].size(); x++) {
+			if (lines[y][x] != '.') {
+				frequencies[lines[y][x]].push_back({ x, y });
+			}
+		}
+	}
 
-	std::cout << "Part 1: " <<  << "\n";
-	Utils::copy();
+	for (auto it = frequencies.begin(); it != frequencies.end(); it++) {
+		std::vector<std::pair<int, int>>& frequency = it->second;
+		for (int i = 0; i < frequency.size() - 1; i++) {
+			for (int j = i + 1; j < frequency.size(); j++) {
+				std::pair<int, int> iToJ = { frequency[j].first - frequency[i].first, frequency[j].second - frequency[i].second };
+				antinodes.insert({ frequency[j].first + iToJ.first, frequency[j].second + iToJ.second });
+				antinodes.insert({ frequency[i].first - iToJ.first, frequency[i].second - iToJ.second });
+			}
+		}
+	}
+
+	auto it = antinodes.begin();
+	while (it != antinodes.end()) {
+		if (it->first < 0 || it->first >= lines[0].size() || it->second < 0 || it->second >= lines.size()) {
+			it = antinodes.erase(it);
+		}
+		else {
+			it++;
+		}
+	}
+
+	std::cout << "Part 1: " << antinodes.size() << "\n";
+	Utils::copy(antinodes.size());
 
 	// Part 2
 
