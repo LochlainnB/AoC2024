@@ -50,6 +50,8 @@ void solution(std::string file) {
 		position += length;
 		isFile = !isFile;
 	}
+	std::vector<File> p2Files = files;
+	std::vector<Space> p2Spaces = spaces;
 
 	std::vector<File> newFiles;
 	isFile = true;
@@ -97,9 +99,42 @@ void solution(std::string file) {
 	Utils::copy(checksum);
 
 	// Part 2
+	newFiles.clear();
+	for (int i = p2Files.size() - 1; i >= 0; i--) {
+		bool moved = false;
+		for (int j = 0; j < p2Spaces.size(); j++) {
+			if (p2Spaces[j].length >= p2Files[i].length) {
+				File& file = p2Files[i];
+				Space& space = p2Spaces[j];
+				if (space.position < file.position) {
+					Space newSpace = { file.position, file.length };
+					file.position = space.position;
+					newFiles.push_back(file);
+					spaces.push_back(newSpace);
+					moved = true;
+					if (p2Spaces[j].length == p2Files[i].length) {
+						p2Spaces.erase(p2Spaces.begin() + j);
+					}
+					else {
+						space.length -= file.length;
+						space.position += file.length;
+					}
+				}
+				j = p2Spaces.size();
+			}
+		}
+		if (!moved) {
+			newFiles.push_back(p2Files[i]);
+		}
+	}
 
-	//std::cout << "Part 2: " <<  << "\n";
-	//Utils::copy();
+	checksum = 0;
+	for (int i = 0; i < newFiles.size(); i++) {
+		checksum += newFiles[i].checksum();
+	}
+
+	std::cout << "Part 2: " << checksum << "\n";
+	Utils::copy(checksum);
 }
 
 int main() {
