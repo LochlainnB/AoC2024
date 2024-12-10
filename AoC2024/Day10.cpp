@@ -31,7 +31,7 @@ struct Candidate {
 	char requiredHeight;
 };
 
-int getScore(std::pair<int, int> start, std::vector<std::string>& map) {
+int getScore(std::pair<int, int> start, std::vector<std::string>& map, bool part1 = true) {
 	int score = 0;
 	std::queue<Candidate> openSet;
 	std::set<Candidate> closedSet;
@@ -57,7 +57,7 @@ int getScore(std::pair<int, int> start, std::vector<std::string>& map) {
 		}
 		for (int i = 0; i < newCandidates.size(); i++) {
 			if (!closedSet.count(newCandidates[i])) {
-				closedSet.insert(newCandidates[i]); // Any route will do
+				if (part1) closedSet.insert(newCandidates[i]); // Any route will do
 				if (newCandidates[i].requiredHeight > '9') {
 					score++;
 				}
@@ -96,9 +96,17 @@ void solution(std::string file) {
 	Utils::copy(total);
 
 	// Part 2
+	total = 0;
+	for (int i = 0; i < lines.size(); i++) {
+		for (int j = 0; j < lines[i].size(); j++) {
+			if (lines[i][j] == '0') {
+				total += getScore({ j, i }, lines, false);
+			}
+		}
+	}
 
-	//std::cout << "Part 2: " <<  << "\n";
-	//Utils::copy();
+	std::cout << "Part 2: " << total << "\n";
+	Utils::copy(total);
 }
 
 int main() {
