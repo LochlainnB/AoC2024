@@ -9,6 +9,24 @@
 #include <set>
 #include <queue>
 
+struct Stone {
+	long long value;
+
+	void blink(std::vector<Stone>& stones);
+};
+
+void Stone::blink(std::vector<Stone>& stones) {
+	if (value == 0) value = 1;
+	else {
+		std::string valueStr = std::to_string(value);
+		if (valueStr.size() % 2 == 0) {
+			value = std::stoll(valueStr.substr(0, valueStr.size() / 2));
+			stones.push_back({ std::stoll(valueStr.substr(valueStr.size() / 2)) });
+		}
+		else value = value * 2024;
+	}
+}
+
 void solution(std::string file) {
 	std::string rawInput = Utils::loadFile(file);
 	// Use lines for 1D vector
@@ -20,9 +38,19 @@ void solution(std::string file) {
 	}
 
 	// Part 1
+	std::vector<Stone> stones;
+	for (int i = 0; i < input[0].size(); i++) {
+		stones.push_back({ std::stoll(input[0][i]) });
+	}
 
-	std::cout << "Part 1: " <<  << "\n";
-	Utils::copy();
+	for (int i = 0; i < 25; i++) {
+		for (int j = stones.size() - 1; j >= 0; j--) {
+			stones[j].blink(stones);
+		}
+	}
+
+	std::cout << "Part 1: " << stones.size() << "\n";
+	Utils::copy(stones.size());
 
 	// Part 2
 
