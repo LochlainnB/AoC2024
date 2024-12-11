@@ -27,6 +27,30 @@ void Stone::blink(std::vector<Stone>& stones) {
 	}
 }
 
+struct pairHash {
+	size_t operator()(const std::pair<long long, int>& key) const {
+		return key.first * key.second;
+	}
+};
+
+long long getStones(long long value, int blinks, std::unordered_map<std::pair<long long, int>, long long, pairHash>& cache) {
+	if (blinks == 0) {
+		return 1;
+	}
+	if (cache.count({ value, blinks })) {
+		return cache[{value, blinks}];
+	}
+	
+	if (value == 0) cache[{value, blinks}] = getStones(1, blinks - 1, cache);
+	else {
+		std::string valueStr = std::to_string(value);
+		if (valueStr.size() % 2 == 0) cache[{value, blinks}] = getStones(std::stoll(valueStr.substr(0, valueStr.size() / 2)), blinks - 1, cache)
+									+ getStones(std::stoll(valueStr.substr(valueStr.size() / 2)), blinks - 1, cache);
+		else cache[{value, blinks}] = getStones(value * 2024, blinks - 1, cache);
+	}
+	return cache[{value, blinks}];
+}
+
 void solution(std::string file) {
 	std::string rawInput = Utils::loadFile(file);
 	// Use lines for 1D vector
@@ -53,9 +77,14 @@ void solution(std::string file) {
 	Utils::copy(stones.size());
 
 	// Part 2
+	long long stoneCount = 0;
+	std::unordered_map<std::pair<long long, int>, long long, pairHash> cache;
+	for (int i = 0; i < input[0].size(); i++) {
+		stoneCount += getStones(std::stoll(input[0][i]), 75, cache);
+	}
 
-	//std::cout << "Part 2: " <<  << "\n";
-	//Utils::copy();
+	std::cout << "Part 2: " << stoneCount << "\n";
+	Utils::copy(stoneCount);
 }
 
 int main() {
