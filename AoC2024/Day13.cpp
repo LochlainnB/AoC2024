@@ -8,6 +8,111 @@
 #include <unordered_map>
 #include <set>
 #include <queue>
+#include <thread>
+#include <mutex>
+
+void getMachineCosts(std::vector<std::vector<std::vector<std::string>>>& input, long long& output, int& index, std::mutex& globalMutex) {
+	globalMutex.lock();
+	while (index < input.size()) {
+		int i = index;
+		index++;
+		std::cout << "Started machine #" << i << "\n";
+		globalMutex.unlock();
+
+		long long x = 0;
+		long long y = 0;
+		int aX = std::stoi(input[i][0][0]);
+		int aY = std::stoi(input[i][0][1]);
+		int bX = std::stoi(input[i][1][0]);
+		int bY = std::stoi(input[i][1][1]);
+		long long pX = std::stoll(input[i][2][0]) + 10000000000000;
+		long long pY = std::stoll(input[i][2][1]) + 10000000000000;
+
+		long long presses = 0;
+		bool done = false;
+		long long cycleBeginX = -1;
+		std::set<int> remaindersX;
+		while (!done) {
+			long long rX = pX - x;
+			if (rX % aX == 0) {
+				if (cycleBeginX == -1) {
+					remaindersX.clear();
+					cycleBeginX = x;
+				}
+				else {
+
+					long long cycleXPresses = (x - cycleBeginX) / bX;
+					long long cycleBeginY = -1;
+					std::set<int> remaindersY;
+					while (!done) {
+						long long rY = pY - y;
+						if (rY % aY == 0) {
+							if (cycleBeginY == -1) {
+								remaindersY.clear();
+								cycleBeginY = y;
+							}
+							else {
+
+								long long cycleYPresses = (y - cycleBeginY) / bY;
+								while (!done) {
+									rX = pX - x;
+									rY = pY - y;
+									if (rX / aX == rY / aY) {
+										globalMutex.lock();
+										output += presses + 3 * rX / aX;
+										globalMutex.unlock();
+										done = true;
+									}
+
+									if (!done) {
+										x += cycleYPresses * bX;
+										y += cycleYPresses * bY;
+										presses += cycleYPresses;
+
+										if (x > pX || y > pY) {
+											done = true;
+										}
+									}
+								}
+							}
+						}
+						else {
+							if (remaindersY.count(rY % aY)) {
+								done = true;
+							}
+							else {
+								remaindersY.insert(rY % aY);
+							}
+						}
+
+						if (!done) {
+							x += cycleXPresses * bX;
+							y += cycleXPresses * bY;
+							presses += cycleXPresses;
+						}
+					}
+				}
+			}
+			else {
+				if (remaindersX.count(rX % aX)) {
+					done = true;
+				}
+				else {
+					remaindersX.insert(rX % aX);
+				}
+			}
+
+			if (!done) {
+				x += bX;
+				y += bY;
+				presses++;
+			}
+		}
+		globalMutex.lock();
+		std::cout << "Finished machine #" << i << "\n";
+	}
+	globalMutex.unlock();
+}
 
 void solution(std::string file) {
 	std::string rawInput = Utils::loadFile(file);
@@ -26,7 +131,7 @@ void solution(std::string file) {
 		}
 	}
 
-	// Part 1
+	// Part 1 - Covering every edge case, even those that don't exist!
 	long long total = 0;
 	for (int i = 0; i < input.size(); i++) {
 		int x = 0;
@@ -89,9 +194,20 @@ void solution(std::string file) {
 	Utils::copy(total);
 
 	// Part 2
+	total = 0;
+	int numThreads = std::thread::hardware_concurrency();
+	std::vector<std::thread> threads(numThreads);
+	int index = 0;
+	std::mutex globalMutex;
+	for (int i = 0; i < numThreads; i++) {
+		threads[i] = std::thread(getMachineCosts, std::ref(input), std::ref(total), std::ref(index), std::ref(globalMutex));
+	}
+	for (int i = 0; i < threads.size(); i++) {
+		threads[i].join();
+	}
 
-	//std::cout << "Part 2: " <<  << "\n";
-	//Utils::copy();
+	std::cout << "Part 2: " << total << "\n";
+	Utils::copy(total);
 }
 
 int main() {
