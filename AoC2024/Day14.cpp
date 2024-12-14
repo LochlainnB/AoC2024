@@ -85,9 +85,38 @@ void solution(std::string file) {
 	Utils::copy(safetyFactor);
 
 	// Part 2
+	std::vector<Robot> robots;
+	std::set<Utils::Vector2ll> map;
+	for (int i = 0; i < input.size(); i++) {
+		robots.push_back({ Utils::Vector2ll(std::stoll(input[i][0][0]), std::stoll(input[i][0][1])), Utils::Vector2ll(std::stoll(input[i][1][0]), std::stoll(input[i][1][1])), boardSize });
+	}
+	int seconds = 0;
+	std::string done = "";
+	while (done != "y") {
+		seconds++;
+		map.clear();
+		for (int i = 0; i < robots.size(); i++) {
+			robots[i].update();
+			map.insert(robots[i].position);
+		}
+		if (((seconds - 38) % boardSize.x == 0 || (seconds - 88) % boardSize.y == 0) && seconds > 7500) {
+			for (int y = 0; y < boardSize.y; y++) {
+				for (int x = 0; x < boardSize.x; x++) {
+					if (map.count({ x, y })) {
+						std::cout << "#";
+					}
+					else {
+						std::cout << ".";
+					}
+				}
+				std::cout << "\n";
+			}
+			std::cin >> done;
+		}
+	}
 
-	//std::cout << "Part 2: " <<  << "\n";
-	//Utils::copy();
+	std::cout << "Part 2: " << seconds << "\n";
+	Utils::copy(seconds);
 }
 
 int main() {

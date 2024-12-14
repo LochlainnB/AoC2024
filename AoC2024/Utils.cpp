@@ -111,4 +111,9 @@ bool Vector2ll::operator==(const Vector2ll& other) const {
 bool Vector2ll::operator!=(const Vector2ll& other) const {
 	return x != other.x || y != other.y;
 }
+
+bool Vector2ll::operator<(const Vector2ll& other) const {
+	if (x != other.x) return x < other.x;
+	return y < other.y;
+}
 }
