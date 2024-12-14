@@ -1,5 +1,6 @@
 #include "Utils.h"
 
+namespace Utils {
 std::string Utils::loadFile(std::string path) {
 	std::ifstream file;
 	file.open(path, std::ifstream::in);
@@ -41,4 +42,73 @@ void Utils::copy(std::string str) {
 	if (OpenClipboard(NULL) == 0 || EmptyClipboard() == 0 || SetClipboardData(CF_TEXT, mem) == NULL || CloseClipboard() == 0) {
 		std::cout << "Failed to copy string \"" << str << "\" to clipboard.\n";
 	}
+}
+
+Vector2ll::Vector2ll() {
+	x = 0;
+	y = 0;
+}
+
+Vector2ll::Vector2ll(long long x, long long y) {
+	this->x = x;
+	this->y = y;
+}
+
+Vector2ll::~Vector2ll() {
+
+}
+
+Vector2ll Vector2ll::operator+(const Vector2ll& other) const {
+	return Vector2ll(x + other.x, y + other.y);
+}
+
+Vector2ll Vector2ll::operator-(const Vector2ll& other) const {
+	return Vector2ll(x - other.x, y - other.y);
+}
+
+Vector2ll Vector2ll::operator*(const long long& other) const {
+	return Vector2ll(x * other, y * other);
+}
+
+Vector2ll Vector2ll::operator/(const long long& other) const {
+	return Vector2ll(x / other, y / other);
+}
+
+Vector2ll& Vector2ll::operator=(const Vector2ll& other) {
+	x = other.x;
+	y = other.y;
+	return *this;
+}
+
+Vector2ll& Vector2ll::operator+=(const Vector2ll& other) {
+	x += other.x;
+	y += other.y;
+	return *this;
+}
+
+Vector2ll& Vector2ll::operator-=(const Vector2ll& other) {
+	x -= other.x;
+	y -= other.y;
+	return *this;
+}
+
+Vector2ll& Vector2ll::operator*=(const long long& other) {
+	x *= other;
+	y *= other;
+	return *this;
+}
+
+Vector2ll& Vector2ll::operator/=(const long long& other) {
+	x /= other;
+	y /= other;
+	return *this;
+}
+
+bool Vector2ll::operator==(const Vector2ll& other) const {
+	return x == other.x && y == other.y;
+}
+
+bool Vector2ll::operator!=(const Vector2ll& other) const {
+	return x != other.x || y != other.y;
+}
 }
