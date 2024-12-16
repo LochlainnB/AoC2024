@@ -36,6 +36,8 @@ public:
 	bool operator==(const Vector2ll& other) const;
 	bool operator!=(const Vector2ll& other) const;
 
+	long long getManhattan();
+
 	// For std::set, not comparing lengths
 	bool operator<(const Vector2ll& other) const;
 

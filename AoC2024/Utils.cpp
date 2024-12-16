@@ -112,6 +112,10 @@ bool Vector2ll::operator!=(const Vector2ll& other) const {
 	return x != other.x || y != other.y;
 }
 
+long long Vector2ll::getManhattan() {
+	return abs(x) + abs(y);
+}
+
 bool Vector2ll::operator<(const Vector2ll& other) const {
 	if (x != other.x) return x < other.x;
 	return y < other.y;
