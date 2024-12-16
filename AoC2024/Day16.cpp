@@ -24,7 +24,7 @@ struct Comp {
 	}
 };
 
-long long aStar(std::vector<std::string>& map) {
+long long aStar(std::vector<std::string>& map, bool part2 = false) {
 	Utils::Vector2ll startPos = Utils::Vector2ll(1, map.size() - 2);
 	Utils::Vector2ll endPos = Utils::Vector2ll(map[0].size() - 2, 1);
 
@@ -43,6 +43,8 @@ long long aStar(std::vector<std::string>& map) {
 	Node* start = graph[startPos.y][startPos.x][static_cast<int>(Direction::RIGHT)];
 	start->cost = 0;
 	openSet.push(start);
+
+	long long result = -1;
 
 	while (!openSet.empty()) {
 		Node* node = openSet.top();
@@ -73,12 +75,59 @@ long long aStar(std::vector<std::string>& map) {
 				candidates[i]->cost = node->cost + addedCost;
 				openSet.push(candidates[i]);
 				if (candidates[i]->position == endPos) {
-					return candidates[i]->cost;
+					if (!part2) return candidates[i]->cost;
+					if (result == -1) result = candidates[i]->cost;
 				}
 			}
 		}
 	}
-	return -1;
+	if (!part2) return -1;
+
+	// Part 2
+	std::set<Utils::Vector2ll> seats;
+	std::queue<Node*> bfsOpenSet;
+	for (int d = 0; d < 4; d++) {
+		Node* endNode = graph[endPos.y][endPos.x][d];
+		if (endNode->cost == result) {
+			bfsOpenSet.push(endNode);
+		}
+	}
+
+	while (!bfsOpenSet.empty()) {
+		Node* node = bfsOpenSet.front();
+		bfsOpenSet.pop();
+		seats.insert(node->position);
+
+		if (node->position == startPos) continue;
+
+		std::vector<Node*> candidates;
+
+		switch (node->direction) {
+		case Direction::RIGHT:
+			candidates.push_back(graph[node->position.y][node->position.x - 1][static_cast<int>(node->direction)]);
+			break;
+		case Direction::DOWN:
+			candidates.push_back(graph[node->position.y - 1][node->position.x][static_cast<int>(node->direction)]);
+			break;
+		case Direction::LEFT:
+			candidates.push_back(graph[node->position.y][node->position.x + 1][static_cast<int>(node->direction)]);
+			break;
+		case Direction::UP:
+			candidates.push_back(graph[node->position.y + 1][node->position.x][static_cast<int>(node->direction)]);
+			break;
+		}
+
+		candidates.push_back(graph[node->position.y][node->position.x][(static_cast<int>(node->direction) + 1) % 4]);
+		candidates.push_back(graph[node->position.y][node->position.x][(static_cast<int>(node->direction) + 3) % 4]);
+
+		for (int i = 0; i < candidates.size(); i++) {
+			int addedCost = i > 0 ? 1000 : 1;
+			if (candidates[i] != nullptr && candidates[i]->cost == node->cost - addedCost) {
+				bfsOpenSet.push(candidates[i]);
+			}
+		}
+	}
+	return seats.size();
 }
 
 void solution(std::string file) {
@@ -98,9 +147,10 @@ void solution(std::string file) {
 	Utils::copy(total);
 
 	// Part 2
+	total = aStar(lines, true);
 
-	//std::cout << "Part 2: " <<  << "\n";
-	//Utils::copy();
+	std::cout << "Part 2: " << total << "\n";
+	Utils::copy(total);
 }
 
 int main() {
