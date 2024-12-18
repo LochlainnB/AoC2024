@@ -96,9 +96,24 @@ void solution(std::string file) {
 	Utils::copy(steps);
 
 	// Part 2
+	int byte = 0;
+	while (steps != -1) {
+		byte++;
+		for (int y = 0; y < graph.size(); y++) {
+			for (int x = 0; x < graph[0].size(); x++) {
+				if (graph[y][x] != nullptr) {
+					graph[y][x]->cost = LLONG_MAX;
+				}
+			}
+		}
+		Node* node = graph[std::stoi(input[byte][1])][std::stoi(input[byte][0])];
+		if (node) delete node;
+		graph[std::stoi(input[byte][1])][std::stoi(input[byte][0])] = nullptr;
+		steps = aStar(graph);
+	}
 
-	//std::cout << "Part 2: " <<  << "\n";
-	//Utils::copy();
+	std::cout << "Part 2: " << input[byte][0] << "," << input[byte][1] << "\n";
+	Utils::copy(input[byte][0] + "," + input[byte][1]);
 }
 
 int main() {
