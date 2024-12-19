@@ -9,20 +9,43 @@
 #include <set>
 #include <queue>
 
-void solution(std::string file) {
-	std::string rawInput = Utils::loadFile(file);
-	// Use lines for 1D vector
-	std::vector<std::string> lines = Utils::split(rawInput, "\n");
-	// Use input for 2D vector
-	std::vector<std::vector<std::string>> input;
-	for (int i = 0; i < lines.size(); i++) {
-		input.push_back(Utils::split(lines[i], " "));
+bool matchDesign(std::string design, std::vector<std::string>& towels, std::unordered_map<std::string, bool>& cache) {
+	if (cache.count(design)) {
+		return cache[design];
+	}
+	if (design.size() == 0) {
+		return true;
 	}
 
-	// Part 1
+	for (int i = 0; i < towels.size(); i++) {
+		if (design.substr(0, towels[i].size()) == towels[i]) {
+			if (matchDesign(design.substr(towels[i].size()), towels, cache)) {
+				cache[design] = true;
+				return true;
+			}
+		}
+	}
+	cache[design] = false;
+	return false;
+}
 
-	std::cout << "Part 1: " <<  << "\n";
-	Utils::copy();
+void solution(std::string file) {
+	std::string rawInput = Utils::loadFile(file);
+	std::vector<std::string> blocks = Utils::split(rawInput, "\n\n");
+	std::vector<std::string> towels = Utils::split(blocks[0], ", ");
+	std::vector<std::string> designs = Utils::split(blocks[1], "\n");
+
+	// Part 1
+	int possible = 0;
+	std::unordered_map<std::string, bool> cache;
+	for (int i = 0; i < designs.size(); i++) {
+		if (matchDesign(designs[i], towels, cache)) {
+			possible++;
+		}
+	}
+
+	std::cout << "Part 1: " << possible << "\n";
+	Utils::copy(possible);
 
 	// Part 2
 
