@@ -126,9 +126,31 @@ void solution(std::string file) {
 	Utils::copy(validCheats);
 
 	// Part 2
+	aStar(graph, startPos, endPos);
+	validCheats = 0;
+	for (int y = 0; y < lines.size(); y++) {
+		for (int x = 0; x < lines[y].size(); x++) {
+			if (lines[y][x] != '#') {
+				long long toCheatCost = graph[y][x]->cost;
+				for (int yOff = -20; yOff <= 20; yOff++) {
+					for (int xOff = -20 + abs(yOff); xOff <= 20 - abs(yOff); xOff++) {
+						Utils::Vector2ll cheatedPos = { x + xOff, y + yOff };
+						if (cheatedPos.x >= 0 && cheatedPos.y >= 0 && cheatedPos.x < graph[0].size() && cheatedPos.y < graph.size() && lines[cheatedPos.y][cheatedPos.x] != '#') {
+							long long cheatCost = abs(xOff) + abs(yOff);
+							long long toEndCost = graph[endPos.y][endPos.x]->cost - graph[cheatedPos.y][cheatedPos.x]->cost;
+							long long totalCost = toCheatCost + cheatCost + toEndCost;
+							if (totalCost <= normalCost - 100) {
+								validCheats++;
+							}
+						}
+					}
+				}
+			}
+		}
+	}
 
-	//std::cout << "Part 2: " <<  << "\n";
-	//Utils::copy();
+	std::cout << "Part 2: " << validCheats << "\n";
+	Utils::copy(validCheats);
 }
 
 int main() {
