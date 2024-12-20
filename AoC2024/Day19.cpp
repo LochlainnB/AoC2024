@@ -9,24 +9,22 @@
 #include <set>
 #include <queue>
 
-bool matchDesign(std::string design, std::vector<std::string>& towels, std::unordered_map<std::string, bool>& cache) {
+long long matchDesign(std::string design, std::vector<std::string>& towels, std::unordered_map<std::string, long long>& cache) {
 	if (cache.count(design)) {
 		return cache[design];
 	}
-	if (design.size() == 0) {
-		return true;
-	}
 
+	long long total = 0;
 	for (int i = 0; i < towels.size(); i++) {
 		if (design.substr(0, towels[i].size()) == towels[i]) {
-			if (matchDesign(design.substr(towels[i].size()), towels, cache)) {
-				cache[design] = true;
-				return true;
+			if (design.size() > towels[i].size()) {
+				total += matchDesign(design.substr(towels[i].size()), towels, cache);
 			}
+			else total++;
 		}
 	}
-	cache[design] = false;
-	return false;
+	cache[design] = total;
+	return total;
 }
 
 void solution(std::string file) {
@@ -37,7 +35,7 @@ void solution(std::string file) {
 
 	// Part 1
 	int possible = 0;
-	std::unordered_map<std::string, bool> cache;
+	std::unordered_map<std::string, long long> cache;
 	for (int i = 0; i < designs.size(); i++) {
 		if (matchDesign(designs[i], towels, cache)) {
 			possible++;
@@ -48,9 +46,13 @@ void solution(std::string file) {
 	Utils::copy(possible);
 
 	// Part 2
+	long long combinations = 0;
+	for (int i = 0; i < designs.size(); i++) {
+		combinations += matchDesign(designs[i], towels, cache);
+	}
 
-	//std::cout << "Part 2: " <<  << "\n";
-	//Utils::copy();
+	std::cout << "Part 2: " << combinations << "\n";
+	Utils::copy(combinations);
 }
 
 int main() {
