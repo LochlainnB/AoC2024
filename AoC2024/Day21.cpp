@@ -159,48 +159,77 @@ std::vector<std::string> codeToDirectional(std::string code) {
 	return results;
 }
 
-std::map<std::string, std::string> directionalPaths = {
-	{"A^", "<"},
-	{"A>", "v"},
-	{"Av", "v<"},
-	{"A<", "v<<"},
+std::map<std::string, std::vector<std::string>> directionalPaths = {
+	{"AA", {""}},
+	{"A^", {"<"}},
+	{"A>", {"v"}},
+	{"Av", {"v<", "<v"}},
+	{"A<", {"v<<"}},
 
-	{"^A", ">"},
-	{"^>", "v>"},
-	{"^v", "v"},
-	{"^<", "v<"},
+	{"^A", {">"}},
+	{"^^", {""}},
+	{"^>", {"v>", ">v"}},
+	{"^v", {"v"}},
+	{"^<", {"v<"}},
 
-	{">A", "^"},
-	{">^", "^<"},
-	{">v", "<"},
-	{"><", "<"},
+	{">A", {"^"}},
+	{">^", {"^<", "<^"}},
+	{">>", {""}},
+	{">v", {"<"}},
+	{"><", {"<"}},
 
-	{"vA", "^>"},
-	{"v^", "^"},
-	{"v>", ">"},
-	{"v<", "<"},
+	{"vA", {"^>", ">^"}},
+	{"v^", {"^"}},
+	{"v>", {">"}},
+	{"vv", {""}},
+	{"v<", {"<"}},
 
-	{"<A", ">>^"},
-	{"<^", ">^"},
-	{"<>", ">>"},
-	{"<v", ">"},
+	{"<A", {">>^"}},
+	{"<^", {">^"}},
+	{"<>", {">>"}},
+	{"<v", {">"}},
+	{"<<", {""}},
 };
 
-std::string directionalToDirectional(std::string input) {
+struct cacheHash {
+	size_t operator()(const std::pair<std::string, int>& key) const {
+		return std::hash<std::string>()(key.first) ^ (std::hash<int>()(key.second) << 1);
+	}
+};
+
+long long directionalToDirectional(std::string input, int levels, std::unordered_map<std::pair<std::string, int>, long long, cacheHash>& cache) {
 	input = "A" + input;
-	std::string result = "";
+
+	std::pair<std::string, int> key = { input, levels };
+	if (cache.count(key)) {
+		return cache[key];
+	}
+	
+	long long result = 0;
 	for (int i = 0; i < input.size() - 1; i++) {
 		std::string key = input.substr(i, 2);
-		result += directionalPaths[key] + "A";
+		long long newResult = LLONG_MAX;
+		for (int j = 0; j < directionalPaths[key].size(); j++) {
+			std::string part = directionalPaths[key][j] + "A";
+			if (levels > 1) {
+				newResult = min(newResult, directionalToDirectional(part, levels - 1, cache));
+			}
+			else {
+				newResult = min(newResult, part.size());
+			}
+		}
+		if (newResult != LLONG_MAX) {
+			result += newResult;
+		}
 	}
+	cache[{ input, levels }] = result;
 	return result;
 }
 
-std::vector<std::string> directionalToDirectional(std::vector<std::string> input) {
-	std::vector<std::string> results;
+std::vector<long long> directionalToDirectional(std::vector<std::string> input, int levels, std::unordered_map<std::pair<std::string, int>, long long, cacheHash>& cache) {
+	std::vector<long long> results;
 	for (int i = 0; i < input.size(); i++) {
-		std::string result = directionalToDirectional(input[i]);
-		results.push_back(result);
+		results.push_back(directionalToDirectional(input[i], levels, cache));
 	}
 	return results;
 }
@@ -217,15 +246,15 @@ void solution(std::string file) {
 
 	// Part 1
 	long long total = 0;
+	std::unordered_map<std::pair<std::string, int>, long long, cacheHash> cache;
 	for (int i = 0; i < lines.size(); i++) {
 		long long codeNumeric = std::stoll(lines[i].substr(0, lines[i].size() - 1));
 		std::vector<std::string> firstLevel = codeToDirectional(lines[i]);
-		std::vector<std::string> secondLevel = directionalToDirectional(firstLevel);
-		std::vector<std::string> thirdLevel = directionalToDirectional(secondLevel);
+		std::vector<long long> finalLengths = directionalToDirectional(firstLevel, 2, cache);
 		size_t lowest = MAXSIZE_T;
-		for (int j = 0; j < thirdLevel.size(); j++) {
-			if (thirdLevel[j].size() < lowest) {
-				lowest = thirdLevel[j].size();
+		for (int j = 0; j < finalLengths.size(); j++) {
+			if (finalLengths[j] < lowest) {
+				lowest = finalLengths[j];
 			}
 		}
 		total += codeNumeric * lowest;
@@ -235,9 +264,22 @@ void solution(std::string file) {
 	Utils::copy(total);
 
 	// Part 2
+	total = 0;
+	for (int i = 0; i < lines.size(); i++) {
+		long long codeNumeric = std::stoll(lines[i].substr(0, lines[i].size() - 1));
+		std::vector<std::string> firstLevel = codeToDirectional(lines[i]);
+		std::vector<long long> finalLengths = directionalToDirectional(firstLevel, 25, cache);
+		long long lowest = LLONG_MAX;
+		for (int j = 0; j < finalLengths.size(); j++) {
+			if (finalLengths[j] < lowest) {
+				lowest = finalLengths[j];
+			}
+		}
+		total += codeNumeric * lowest;
+	}
 
-	//std::cout << "Part 2: " <<  << "\n";
-	//Utils::copy();
+	std::cout << "Part 2: " << total << "\n";
+	Utils::copy(total);
 }
 
 int main() {
